@@ -1,6 +1,6 @@
 ---
 title: "Assignment 2: Physical Properties of Lakes"
-author: "Student Name"
+author: Sam June
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -28,7 +28,19 @@ The completed exercise is due on 11 September 2019 at 9:00 am.
 4. Set your ggplot theme (can be theme_classic or something else)
 
 ```{r}
+getwd()
 
+library(tidyverse)
+library(lubridate)
+library(cowplot)
+
+NTLdata <- read.csv("./Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv")
+
+class(NTLdata$sampledate)
+NTLdata$sampledate <- as.Date(NTLdata$sampledate, "%m/%d/%y")
+class(NTLdata$sampledate)
+
+theme_set(theme_classic())
 ```
 
 ## Creating and analyzing lake temperature profiles
@@ -38,7 +50,10 @@ The completed exercise is due on 11 September 2019 at 9:00 am.
 5. Choose either Peter or Tuesday Lake. Create a new data frame that wrangles the full data frame so that it only includes that lake during two different years (one year from the early part of the dataset and one year from the late part of the dataset).
 
 ```{r}
+NTL_LTER_Lake_ChemistryPhysics_Raw <- NTL_LTER_Lake_ChemistryPhysics_Raw %>%
+  filter(lakename %in% ("Peter Lake"))
 
+NTL_LTER_Lake_ChemistryPhysics_Raw <- filter(Peterdata, year4 == 1984 | year4 == 2016)
 ```
 
 6. Create three graphs: (1) temperature profiles for the early year, (2) temperature profiles for the late year, and (3) a `plot_grid` of the two graphs together. Choose `geom_point` and color your points by date. 
@@ -46,18 +61,52 @@ The completed exercise is due on 11 September 2019 at 9:00 am.
 Remember to edit your graphs so they follow good data visualization practices.
 
 ```{r}
+Peterdata <- filter(NTL_LTER_Lake_ChemistryPhysics_Raw, lakename == "Peter Lake")
 
+Peterdata.1984 <- filter(Peterdata, year4 == 1984)
+Peterdata.2016 <- filter(Peterdata, year4 == 2016)
+
+Tempprofiles1984 <- 
+  ggplot(Peterdata.1984, aes(x = temperature_C, y = depth, color = daynum)) +
+  geom_point() +
+  scale_y_reverse() +
+  scale_x_continuous(position = "top") +
+  scale_color_viridis_c() +
+  labs(x = expression("Temperature "(degree*C)), y = "Depth (m)", 
+       color = "Julian Day")
+print(Tempprofiles1984)
+
+Tempprofiles2016 <- 
+  ggplot(Peterdata.2016, aes(x = temperature_C, y = depth, color = daynum)) +
+  geom_point() +
+  scale_y_reverse() +
+  scale_x_continuous(position = "top") +
+  scale_color_viridis_c() +
+  labs(x = expression("Temperature "(degree*C)), y = "Depth (m)", 
+       color = "Julian Day")
+print(Tempprofiles2016)
+
+Tempprofiles1984.2016 <- 
+  plot_grid(Tempprofiles1984, Tempprofiles2016, 
+            ncol = 2, rel_widths = c(1, 1))
+print(Tempprofiles1984.2016)
 ```
 
 7. Interpret the stratification patterns in your graphs in light of seasonal trends. In addition, do you see differences between the two years?
 
-> 
+> The water temperature is colder in the spring and warms as the year goes on. The water below ~9m remains at 5°C throughout the seasons in 1984 and 2016. The distribution of temperature change through the seasons seems to be more uniform in 2016.
 
 ### Multiple lakes, single date 
 
 8. On July 25, 26, and 27 in 2016, all three lakes (Peter, Paul, and Tuesday) were sampled. Wrangle your data frame to include just these three dates.
 
 ```{r}
+Julydata <-- separate(NTL_LTER_Lake_ChemistryPhysics_Raw, 
+                      sampledate ("y","m","d"))
+
+Julydata <-- separate(NTL_LTER_Lake_ChemistryPhysics_Raw, sampledate, into, sep = "y","m","d", remove = TRUE,
+  convert = FALSE, extra = "warn", fill = "warn", ...)
+
 
 ```
 

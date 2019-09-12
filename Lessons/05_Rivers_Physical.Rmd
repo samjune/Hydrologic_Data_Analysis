@@ -16,6 +16,8 @@ editor_options:
 ## Opening Discussion
 What are the physical properties of streams and rivers? What variables might be of interest?
 
+>variables discussed: discharge (cubic feet per second, a volume over a given amount of time, relies on cross-section horizontal) and flow (flow velocity, a horizontal distance overtime), bed material- may lead to erosion, mixing- more mixing when the water is moving- turbulent + lamninar flow, slope. 
+
 ## Session Set Up
 
 ```{r, message = FALSE}
@@ -33,6 +35,9 @@ theme_set(theme_classic())
 
 One of the most important physical characteristics of a stream or river is **discharge**, the volume of water moving through the stream over a given amount of time. Discharge can be measured directly by measuring the velocity of flow in several spots in a stream and multiplying the flow velocity over the cross-sectional area of the stream. However, this method is effort-intensive. An easier way to approximate discharge is by developing a **rating curve** for a stream at a given sampling point. To develop a rating curve, a series of measurements of discharge and stream stage must be made together to develop a mathematical relationship. Then, subsequent discharge measurements can be calculated from a measurement of stream stage, measured by a gage that takes readings remotely. 
 
+>How do we measure flow? Use a flow meter. Take measurements at different cross-sections. Do that at different areas. Multiply and add different areas. 
+If we know a point at a specific stream stage, we can predict what it would be at any stage.
+
 ```{r}
 EnoDischarge.ratingcurve <- readNWISdv(siteNumbers = "02096500",
                      parameterCd = c("00060", "00065"),
@@ -43,16 +48,25 @@ names(EnoDischarge.ratingcurve)[4:7] <- c("Discharge", "D.Approval.Code",
                                           "Gage.Height", "GH.Approval.Code")
 
 DvsGHplot <-
-  ggplot(EnoDischarge.ratingcurve, aes(x = Discharge, y = Gage.Height)) +
+  ggplot(EnoDischarge.ratingcurve, aes(x = Gage.Height, y = Discharge)) +
   geom_point(alpha = 0.5) 
 print(DvsGHplot)
 ```
+
+>Logrithmic relationship, as discharge increases, gaining less height
+>As get more water moving through, height is going to increase less
+>Each day the gage will measure height, then will extrapolate
+
+>How change ggplot code?
+  switch discharge to y and gage to x
 
 ### Data import
 We will again be using the dataRetrieval package, which allows us to access USGS hydrologic data. We will be using the hydrologic data capabilities of this package today, but the package also comes with additional functionality to access water quality data from the Water Quality Portal. 
 
 dataRetrieval Vignette:
 https://cran.r-project.org/web/packages/dataRetrieval/vignettes/dataRetrieval.html
+
+>includes a lot of functions you could use in the retrieval package
 
 The function `whatNWISdata` allows us to access metadata about a site, including what variables have been monitored at that site, start and end dates, and the number of samples for a given variable.
 
@@ -64,6 +78,8 @@ We will be analyzing data from the following rivers/streams today:
 * Sauk River in Minnesota (Dr. Salk's hometown)
 * Nehalem River in Oregon
 
+>different places in the US, illustrate differences in regions
+
 ```{r}
 EnoSummary <- whatNWISdata(siteNumbers = "02096500")
 VerdeSummary <- whatNWISdata(siteNumbers = "09504000")
@@ -74,9 +90,12 @@ NehalemSummary <- whatNWISdata(siteNumbers = "14299800")
 
 What data are available from the sites? Pay particular attention to the parameter codes and statistic codes.
 
->
+>Hard to read because lots of codes and abreviation
+>Each row is a different type of data, either different variable or statistic
+>Sites do not have same types of data collected at each site
 
 What is the period of record for mean daily discharge at each of these sites?
+>All the way to the right, have beginning date and end date
 
 > Eno River: 
 
@@ -120,6 +139,10 @@ NehalemDischarge <- readNWISdv(siteNumbers = "14299800",
                      endDate = "2019-08-31")
 
 ```
+> would leave start and end dates blank if want to chose the earliest and latest
+>compare size of data frames, we have data for 10 years we should have ~4,000 variables
+>discharge is in feet cube per second, would have to convert for research goals
+
 
 ### Data Wrangling
 ```{r}
@@ -193,22 +216,25 @@ NehalemPlot <-
 print(NehalemPlot)
 
 CombinedPlot <- 
-  plot_grid(EnoPlot, VerdePlot, BitterrootPlot, SaukPlot, NehalemPlot, 
+  plot_grid(BitterrootPlot, SaukPlot, NehalemPlot, EnoPlot, VerdePlot,
             ncol = 1)
 print(CombinedPlot)
 ```
 
 How does the magnitude of discharge compare for these rivers?
 
->
+> The Bitterroot and Sauk rivers have a higher magnitude of discharge.
 
 Which of these rivers have a seasonal cycle of discharge? How might you explain the presence and timing of seasonal cycles based on climatic conditions?
 
->
+> The Bitterroot has a more consistent seasonal cycle, absence of rain in the summer. In Sauk River, there is a snowmelt peak and a wetter summer, the cycle seems to be getting less seasonal in the later years. The Nehalem River seems to peak in the summer. The Eno River seems to have flashier events, the past year was really wet. The Verde River is usually dry but was unsusually wet the past year, there was a huge spike. 
+
+>Interannual: The seasonal cycle is become less defined in the Sauk River. Warming climate, warming winters. More eratic winters. Typical seasonal cycles 
 
 Hypothetical question: If you wanted to create a ggplot using facets instead of `plot_grid`, how would you go about wrangling your dataset differently? 
 
->
+>discharge by date then facet by site number
+>'rbind' have to have same column titles
 
 ## Defining "typical" discharge pattern
 Let's take the Bitterroot River, which displays a clear seasonal cycle. Let's define the median discharge on a given day of year and overlay this onto the range experienced. We will take a longer period of record this time.
@@ -242,3 +268,6 @@ Challenge: Edit the code above so that rather than plotting the minimum and maxi
 
 ## Closing Discussion
 What are your impressions of seasonal and interannual discharge for our example rivers? How might you go about interpreting discharge data for any given river?
+> Patterns in a given regional geographic area...
+> Precipitation vs. discharge, snowmelt vs raion
+> Air temperature vs. discharge

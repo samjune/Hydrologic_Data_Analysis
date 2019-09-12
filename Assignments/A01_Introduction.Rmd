@@ -1,6 +1,6 @@
 ---
 title: "Assignment 1: Introduction"
-author: "Student Name"
+author: "Sam June"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -23,34 +23,43 @@ The completed exercise is due on 2019-09-04 before class begins.
 ## Course Setup
 1. Post the link to your forked GitHub repository below. Your repo should include one or more commits and an edited README file.  
 
->  Link:
+>  Link: https://github.com/samjune/Hydrologic_Data_Analysis
 
 2. Complete the Consent Form in Sakai. You must choose to either opt in or out of the research study being conducted in our course.
 
 Did you complete the form? (yes/no)
 
-> 
+> Yes
 
 ## Course Project
 
 3. What are some topics in aquatic science that are particularly interesting to you?
 
-> ANSWER: 
+> ANSWER: How climate change affects water scarcity in the southwest.
+>Applying Climate Change Risk Management Tools to Integrate Streamflow Projections
+and Social Vulnerability
+>link: https://link.springer.com/article/10.1007/s10021-019-00387-5
 
 4. Are there specific people in class who you would specifically like to have on your team?
 
-> ANSWER: 
+> ANSWER: N/A
 
 5. Are there specific people in class who you would specifically *not* like to have on your team?
 
-> ANSWER: 
+> ANSWER: N/A
 
 ## Data Visualization Exercises
 
 6. Set up your work session. Check your working directory, load packages `tidyverse`,  `dataRetrieval`, and `lubridate`. Set your ggplot theme as theme_classic (you may need to look up how to set your theme).
 
 ```{r, message = FALSE}
+getwd()
 
+library(tidyverse)
+library(lubridate)
+library(dataRetrieval)
+
+theme_set(theme_classic())
 ```
 
 7. Upload discharge data for the Eno River at site 02096500 for the same dates as we studied in class (2009-08-01 through 2019-07-31). Obtain data for discharge and gage height (you will need to look up these parameter codes). Rename the columns with informative titles. Imperial units can be retained (no need to change to metric).

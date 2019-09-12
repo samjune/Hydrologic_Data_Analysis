@@ -155,7 +155,7 @@ print(Tempplot.thermocline)
 ```
 
 Why can't we use a line graph here?
-<add notes here>
+Lines connect with the next year, don't know if that is neccessarily happening, because there is a gap and that line may be fasely making up for it
 ```{r}
 Tempplot.line <- 
   ggplot(Pauldata.surface, aes(x = sampledate, y = temperature_C)) +
@@ -209,13 +209,13 @@ TempprofileAug2016 <-
             color = "#1d91c0")
 print(TempprofileAug2016)
 ```
-<add notes here>
+Water warms up through out the year, a wind event may occur that is strong enough to mix the waters and cool top later while bringing warm layer down.
 
 In some places, the lines are not consistently smooth. What's going on here? How does this differ from your expectations of what the data should look like?
 <add notes here>
 
 If you were to explain this graph to someone who didn't know anything about lakes, how would you describe it? Write your answer below. 
-
+In real world area, you get something unexpected. Samples were taken with profiler. May have shaky hand person or get a cross current charge. Real world data is messy. 
 > 
 
 ### Mixing and stratification
@@ -237,13 +237,15 @@ print(Tempprofiles2016)
 ```
 
 Paul Lake, like many lakes in temperate climates, is **dimictic**. What does this mean? What evidence do you see of this phenomenon in the graph? If you had data from the rest of the year, what would you expect to see?
-<add notes here>
+dimictic- two/mixing- mixes twice through out the year, fall turnover- air cools, lose heat from top of lake, density gradient is lower/spring- ice is on top, as ice melts, have water that is 4 degrees all the way through. Most of data in this graph is from the stratefied time.
 
 
 Let's put your prediction to the test. In 1993, the lake was sampled in November. Wrangle your data to capture this date and create a profile graph of that date.
 ```{r}
 
 ```
+GO THROUGH THIS OUTSIDE OF CLASS.
+
 
 Why does mixing occur in the spring and fall? What are the mechanisms that make this possible?
 <add notes here>
@@ -251,3 +253,4 @@ Why does mixing occur in the spring and fall? What are the mechanisms that make 
 ## Closing Discussion
 
 What are the main concepts you learned about the physical properties of lakes today? What was the evidence for these concepts in the dataset?
+Wind driven, does not mix all the way down because of density, force of wind has to be able to mix water, also need right density gradient.

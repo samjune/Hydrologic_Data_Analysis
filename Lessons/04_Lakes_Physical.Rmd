@@ -16,6 +16,12 @@ editor_options:
 
 ## Opening Discussion
 We analyzed temperature profiles and seasonal changes on Wednesday. What were some key takeaway points about thermal stratification and mixing?
+>Two factors- wind and small density gradient- difference between surface and depth, if not a big difference, it is easier to mix
+epilimnion- surface layer
+hypolimnion- underlayer
+Dimictic, fall and spring- small density gradient and more wind
+4 degree celcius- liquid water maximum density
+  2, 3, and 1 are when the bonds begin to from
 
 ## Session Set Up
 ```{r, message = FALSE}
@@ -94,23 +100,29 @@ print(Physicalprofiles2016)
 
 ```
 
+Why cant we use a faccet?
+faccet- put it in different windows, specific as rows and columns.
+Cannot use it here because we have different scales.
+DO- dissolved oxygen
+
 How do temperature profiles vary over the course of a season? What are the mechanisms for this pattern?
 
-> 
+> The water has a smaller density gradient in the spring. The water is warmed up by the sun throughout the year and the density gradient becomes larger. The wind causes temperature mixing in the water, which minimizes the density gradient. Temperature increases more closer to the surface. Winter is not included in this graph.
 
 How do irradiance profiles vary over the course of a season? What are the mechanisms for this pattern?
 
-> 
+> The sunlight penetrating the water intensifies from spring to summer. There is more sun in the summer. Irradiance is higher at the surface. Water molecules scatter light. Organic matter scatters light. There is an instrument that measures radience, measures 180 around top of sphere.
 
 How do dissolved oxygen profiles vary over the course of a season? What are the mechanisms for this pattern?
 
-> 
+> Chemically and biologically active. Colder water has a capcity to holdmore dissolved gases, including oxygen. Some species of fish require colder water for their oxygen levels. Exchange with the atmosphere increases oxygen. Photosynthesis also increases oxygen. Phytoplankyon will hang out at top of .... Dechloroform-maximum, sitting on top of density gradience. Why is there a drop off, respiration- bateria and other components of food web are respiring. Phytoplankton die and sink down, prodvide nurtrients for bacteria down below. Before drop, have enough light for photosystem. After drop, have respiration. At very bottom, there is just enough for life. Reduction in iron is next best respiration system. Move to different modes of respiration. 
 
 
 ## Data Analysis
 
 ### Long-term change in temperature
 How much have surface temperatures increased over the period of study? Is this increase significant? Isolate surface depths and run the test for May, June, July, and August temperatures separately. Use a linear regression with year as the predictor variable and temperature as the response variable.
+> Yearly variation in months. Climate change is not effecting each month the same.
 
 Steps: 
 
@@ -119,11 +131,30 @@ Steps:
 3. Create 4 separate data frames, one for each month
 4. Run a linear regression for each data frame (see instructions above)
 5. For significant trends, calculate how many degrees the lake has warmed over the period of study
-5. Create a ggplot of surface temps by date and facet by month. Add `geom_smooth(se = FALSE, method = lm)` to the plot to display the regression line.
+6. Create a ggplot of surface temps by date and facet by month. Add `geom_smooth(se = FALSE, method = lm)` to the plot to display the regression line.
 
 ```{r}
+Pauldata <- Pauldata %>%
+  mutate(Month = month(sampledate)) %>%
+  filter(depth == 0 & Month < 11 & Month > 4)
 
+Pauldata.May <- filter(Pauldata.test, Month ==5)
+Pauldata.June <- filter(Pauldata.test, Month ==6)
+Pauldata.July <- filter(Pauldata.test, Month ==7)
+Pauldata.August <- filter(Pauldata.test, Month==8)
 
+Maytest <- lm(data = Pauldata.May, temperature_C ~year4)
+summary(Maytest)
+
+Junetest <- lm(data = Pauldata.June, temperature_C ~year4)
+summary(Junetest)
+
+Temperature.plot <-
+  ggplot(Pauldata.test, aes(x = smapledate, y = temperatre_C)) +
+  geom_point() +
+  geom_smooth(se = FALSE, method = lm) +
+  facet_grid(rows = vars(Month))
+print(Tempchange.plot)
 
 ```
 
