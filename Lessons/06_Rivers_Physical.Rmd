@@ -15,6 +15,9 @@ editor_options:
 
 ## Opening Discussion
 How is climate change impacting discharge in streams and rivers? What are the new and ongoing challenges faced by these impacts in watersheds?
+>Massive difference in salinity.
+>Unpredictable, more severe events, more attention from government.
+>Recourance intervals are changeing, can see in data.
 
 ## Session Set Up
 
@@ -32,16 +35,25 @@ theme_set(theme_classic())
 ## Recurrence Intervals and Exceededence Probability
 
 A **recurrence interval** is the past recurrence of an event, in this case a peak annual discharge measurement of a given magnitude. The value of a recurrence interval corresponds to the average number of years between discharge of a given magnitude. Typically the minimum amount of years required to construct a recurrence interval is 10, but 30 is more robust. A recurrence interval, T, is calculated as: 
+>Number of years between a given year of discharge.
+>Need at least 10, 30 robust, for a given stream.
+>What is the importance for having more years on record? Gives you more information, more statistical power, may have more weird years, won't capture those in 10 years.
 
 $T = (n+1)/m$
+
+>Number of years (n) plus 1. Divide by the rank of that event.
 
 where n is the number of years and m is the ranking of an event within the observed period. We add one to n because we are computing the recurrence interval for a discharge event of a given magnitude *or greater*. 
 
 Similarly, we can calculate an **exceedence probability**, or the probability of encountering a discharge event of a given magnitude or greater in any given year: 
+>in terms of a value of 0-1
+>this is where we get "100 year flood"
+>not when you are going to see it but based on the probability, that is when you most likely will based on past data.
 
 $P = 1/T$
 
 This is where the terms "100-year flood" and similar are derived. Remember this is a probability based on past occurrence, not an accurate forecast of how often we will see that event happening. When current patterns of discharge differ from past patterns, we observe **nonstationary** behavior. Nonstationarity results in events that occur more or less frequency than predicted based on the exceedence probability.
+>nonstationary- if a stream is displaying stationary behavior, we are seeing typical behavior. Recourance relies on stationary behavior to predict probability.
 
 ### Has Eno River dicharge displayed stationary behavior over the period of record?
 
@@ -65,6 +77,7 @@ EnoPlot <-
          xlab("Year")
 print(EnoPlot)
 ```
+>Flashy events, looks variable. Erratic dischange patterns. Cluster events, multi interannual events. 
 
 We can then compute recurrence intervals based on the first 30 years of data.
 
@@ -88,6 +101,7 @@ EnoPeakPlot <-
          xlab("Year")
 print(EnoPeakPlot)
 ```
+> Very erratic, hard to predict when the peak discharge will take place.
 
 Let's display and model the relationship between peak annual disharge and recurrence interval. We can use the statistical model to compute discharge for recurrence intervals that occur above the 30-year mark.
 ```{r}
@@ -104,6 +118,9 @@ summary(Eno.RImodel)
 Eno.RImodel$coefficients[1] + Eno.RImodel$coefficients[2]*log(100)
 Eno.RImodel$coefficients[1] + Eno.RImodel$coefficients[2]*log(500)
 ```
+>[1]First coeficient is y-intercept of model
+>Increasing at an decreasing rate, platueing, hitting an asymptote.
+>Assuming stationarity, assuming future is going to behave like past.
 
 What if we were to build a recurrence interval model for the entire period of record? How would this compare to the 30-year construction?
 ```{r}
@@ -137,11 +154,14 @@ Eno.RImodel$coefficients[1] + Eno.RImodel$coefficients[2]*log(500)
 
 What differences did you see for the recurrence intervals built under different periods of record? How would your prediction of flood events differ if you were to use these models for forecasting purposes? 
 
->
+> Magnitude increased for larger discharge events (teal line). Discharge events are higher than we would predict. The blackline (10 years of data) underpreditcs the teal line. Intercept is the same but logrithmic is different.
 
 What would you recommend for a watershed manager seeking to build the most accurate recurrence interval model for the Eno River?
 
-> 
+> Use as much past data as possible to get an accurate prediction. Pay attention to the intervals of the biggest events. 
+> Use longest record you have for your stream. Look at discharges for rivers in your area and see if there is a trend.
+> Pay attention to upstream behavior.
+> Use a moving window? Use 30 years, move up every year. Incoropate element of trend analysis.
 
 
 ### Examining the effects of urbanization on discharge
@@ -165,6 +185,25 @@ print(SaladoPlot)
 
 # add more code here: 
 
+SaladoDischarge <- 
+  SaladoDischarge %>%
+  mutate(Year = year(Date))
+
+
+SaladoRecurrence <- 
+  SaladoDischarge %>%
+  filter(Year < 1990) %>%
+  group_by(Year) %>%
+  summarise(SaladoPeakDischarge = max(SaladoDischarge)) %>% 
+  mutate(Rank = rank(-SaladoPeakDischarge), 
+        SaladoRecurrenceInterval = (length(Year) + 1)/Rank, 
+         Probability = 1/SaladoRecurrenceInterval)
+
+SaladoPeakPlot <- 
+  ggplot(SaladoRecurrence, aes(x = Year, y = SaladoPeakDischarge)) +
+         geom_bar(stat = "identity") +
+         xlab("Year")
+print(SaladoPeakPlot)
 ```
 
 ### Examining the effects of dam construction on recurrence intervals

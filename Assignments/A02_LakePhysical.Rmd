@@ -50,10 +50,10 @@ theme_set(theme_classic())
 5. Choose either Peter or Tuesday Lake. Create a new data frame that wrangles the full data frame so that it only includes that lake during two different years (one year from the early part of the dataset and one year from the late part of the dataset).
 
 ```{r}
-NTL_LTER_Lake_ChemistryPhysics_Raw <- NTL_LTER_Lake_ChemistryPhysics_Raw %>%
+Peterdata <- NTLdata %>%
   filter(lakename %in% ("Peter Lake"))
 
-NTL_LTER_Lake_ChemistryPhysics_Raw <- filter(Peterdata, year4 == 1984 | year4 == 2016)
+Peterdata1984.2016 <- filter(Peterdata, year4 == 1984 | year4 == 2016)
 ```
 
 6. Create three graphs: (1) temperature profiles for the early year, (2) temperature profiles for the late year, and (3) a `plot_grid` of the two graphs together. Choose `geom_point` and color your points by date. 
@@ -61,7 +61,7 @@ NTL_LTER_Lake_ChemistryPhysics_Raw <- filter(Peterdata, year4 == 1984 | year4 ==
 Remember to edit your graphs so they follow good data visualization practices.
 
 ```{r}
-Peterdata <- filter(NTL_LTER_Lake_ChemistryPhysics_Raw, lakename == "Peter Lake")
+Peterdata <- filter(NTLdata, lakename == "Peter Lake")
 
 Peterdata.1984 <- filter(Peterdata, year4 == 1984)
 Peterdata.2016 <- filter(Peterdata, year4 == 2016)
@@ -101,12 +101,8 @@ print(Tempprofiles1984.2016)
 8. On July 25, 26, and 27 in 2016, all three lakes (Peter, Paul, and Tuesday) were sampled. Wrangle your data frame to include just these three dates.
 
 ```{r}
-Julydata <-- separate(NTL_LTER_Lake_ChemistryPhysics_Raw, 
-                      sampledate ("y","m","d"))
-
-Julydata <-- separate(NTL_LTER_Lake_ChemistryPhysics_Raw, sampledate, into, sep = "y","m","d", remove = TRUE,
-  convert = FALSE, extra = "warn", fill = "warn", ...)
-
+NTLdataJulyDates <- filter(NTLdata, sampledate > as.Date ("2016-07-24") & 
+                             sampledate < as.Date ("2016-07-28"))
 
 ```
 
