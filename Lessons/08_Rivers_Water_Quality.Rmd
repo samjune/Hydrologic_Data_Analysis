@@ -15,12 +15,17 @@ editor_options:
 
 ## Opening Discussion
 What are indicator species? Why are they helpful in thinking about water quality?
-
+> Stands for a bunch of different water parameters.
+> Species that indicate all is not well.
+> Presense and absence of certain bacteria.
 
 ## Session Set Up
 
 ```{r, message = FALSE}
 getwd()
+
+library(xts)
+library(dygraphs)
 
 packages <- c("tidyverse", 
               "dataRetrieval", 
@@ -37,27 +42,31 @@ theme_set(theme_classic(base_size = 12))
 ## Microbiological indicators
 
 Bacteria is present in almost every stream on earth. Most bacteria are harmless, but some are extremely dangerous to human health.Typical sources of bacterial contamination include waste water treatment plants, animal manure lagoons, and septic systems. There are multiple ways that bacteria can be measured for water quality.
+> It is sometimes hard to know whether or not they are there. There are tests to see if they are there.
 
+> 4 different tests:
 1) **Total cell counts**. One way to measure the bacteria in water is to count the number of cells under a microscope in a given volumn of water (such as 1 mL). The units for this metric are cells ml^-1^.
+>> measure how many cells are in one bacteria
 2) **Total coliforms**. Coliform bacteria are for the most part harmless microorganisms that live in animal intestines. Total coliforms are often used as a metric of how much raw or insufficiently treated sewage is making its way into a water body. The way these are measured are by taking a known volume of water, cultivating it in the lab, and counting the number of colonies that grow. Units for this metric are colony forming units (cfu) per 100 ml.
+> >spread water on pitri dish, heat up and see what grows
 3) **Fecal coliforms**. Fecal coliforms are coliforms that are specifically associated with warm-blooded animals, and can be grown at higher temperatures than other coliforms. Fecal coliforms are a more precise way of estimating sewage inputs, though they are only an indicator species and not necessarily harmful. The most well known species in this group is Escherichia coli (E. coli). Units are cfu per 100 ml. 
 4) **Fecal streptocci**. Fecal streptocci are a different type of bacteria that are also associated with human and animal digestive tracts. Streptocci are more widespread than coliforms. Units are cfu per 100 ml.
 
 Why might it be helpful to have multiple ways to measure bacteria?
-
->
+> If using only one way, may be errors. Want to use cross-validation.
 
 Where and when do you think the biggest risks from harmful bacteria are?
-
->
+> Take more time and effort. What is the frequency of these water samples?
+> Really only going to sample in areas where we think there are going to be issues. Has to be a high priority area, creates bias. Drinking water reseviors get sampled more. Downstream from water treatment plants also get sampled a lot.
 
 Measuring microbiogial indicators is more expensive and time consuming than some other water quality metrics. Where and when would you measure these?
-
 >
 
 ## How have improvements in sewage treatment affected water quality?
 
-We will import data from the Merrimack River near Lowell, Massachusetts. The Merrimack valley has a long history of industrial use, and has many mid-sized cities along the river corridor. Most of these cities have old infrastructure, and their wastewater treatment plants (WWTPs) are built next to the river and discharge directly into the water. Since the passage of the Clean Water Act, plants have either been retrofitted, or new facilities have been built to try to meet the criteria for the *point source discharges*. 
+We will import data from the Merrimack River near Lowell, Massachusetts. The Merrimack valley has a long history of industrial use, and has many mid-sized cities along the river corridor. Most of these cities have old infrastructure, and their wastewater treatment plants (WWTPs) are built next to the river and discharge directly into the water. Since the passage of the Clean Water Act, plants have either been retrofitted, or new facilities have been built to try to meet the criteria for the *point source discharges*.
+>> post industrial cities, cities with old structure, retrofitted
+>> point-source discharge, pipes that go straight out into stream
 
 We will import a number of water quality parameters. Remember to reference ```parameterCdFile``` for metadata about the parameters.
 
@@ -68,8 +77,11 @@ dat.raw <- readNWISqw(siteNumbers = "01096550", #Merrimack River upstream of Low
                      parameterCd = c("95200",  #Total cell count
                                      "31501",  #Total coliforms
                                      "31625",  #Fecal coliforms (0.7 um filter)
+                                     # difference is the fecal size. bigger filter passes more things through, more water passes through and more colonies grow with that water.
                                      "31616",  #Fecal coliforms (0.45 um filter)
+                                     # what difference does this make in results? difference in filter size. smaller filter going to capture more.
                                      "31673",  #Fecal streptocci KF streptocaccus
+                                     # different subsections of genus
                                      "31679"), #Fecal streptocci m-Enterococcus
                      startDate = "",
                      endDate = "")
@@ -98,6 +110,7 @@ Total.coli.plot <- ggplot(microb.dat, aes(x = Date)) +
   lims(x = c(begin.date, end.date)) +
   labs(x = "", y = "Total coliforms (cfu / 100 ml)") +
   theme(legend.position = "top")
+
 
 print(Total.coli.plot)
 
@@ -156,21 +169,27 @@ Microbes.plot <- plot_grid(Total.coli.plot +
                            Total.cell.plot + 
                              labs(title = "Total cell count", y = ""),
                            ncol = 1)
+# took each plot and made y-axis plank
+# legend postion option- move legend to top
+# change size of title in theme. theme(plot.title = element_text(size = 3))
+# something like that! Google it. Use help functions. ?theme()
 
 print(Microbes.plot)
 ```
 
 How would you use all of this data to talk about changes in microbial water quality from 1970 to 2000? What are the challenges?
-
->
+> scales on graph are different, none of the data is continuous, all different measures
+> Total coliform is everything, fecal coliform is subset, next broadest is .7 (lets more things through because it is a larger filter size), most restrictive is .45
+>Total coliform would give the largest number- more colonies
+> just because data isnt consistent with itself doesnt mean you have to through it out
 
 Do you think water quality has improved between 1970 and 2000? Why or why not?
 
->
+> yes.
 
 The city of Lawrence, MA is downstream of Lowell and gets its drinking water from the Merrimack River. Use the federal drinking water standard for Total Coliforms (https://www.epa.gov/ground-water-and-drinking-water/national-primary-drinking-water-regulations#Microorganisms) to comment on whether or not this water necessarily needs to be treated for bacteria.
 
->
+> water quality for communities that have to drink water downstream
 
 ## Seasonal Trends in Water Quality
 
@@ -201,25 +220,25 @@ print(coli.seasons)
 
 When are total coliform concentrations highest? Why might this be?
 
->
+> Highest in summer because grow more in heat
 
 Does this pattern also exist for the other microbial indicators?
 
->
+> not all coliform are fecal coliform
 
 ## Combined Sewer Overflows (CSOs)
 
 Many older WWTPs combine the sanitary sewer system of a city and the storm water drainage sewers (e.g. street drains) together before treatment. Treatment occurs in tanks dug in the facilities, and treatment takes usually about a day. When there is a big rainfall event, the amount of water coming through the storm drains can overwhelm the holding capacity in the tanks, and untreated sewage can get discharged into receiving waterbodies. We will next look to see if any of the high bacterial measurements correspond to storm events.
+> water comes from municipal, sewage and rain water drain, combine at water treatment plant
 
 The USGS site that we got the water quality data from does not have discharge data. Other nearby sites with discharge data include a site (```01100000```) 4 miles downstream on the Merrimack River, or a site (```01099500```) 4 miles away on the Concord River. The Merrimack River at this location drains ~4,000 square miles, and the Concord River drains ~400 square miles. 
+> want to know when there are floods
 
 Which site's discharge data would better indicate when the city of Lowell has exprienced a big rain event?
-
->
+> the smaller river because reacts more to local conditions
 
 What would a CSO event look like in the data?
-
->
+> 
 
 ```{r pull_hydrology}
 
@@ -241,15 +260,24 @@ Total_Coliform <- with(microb.dat, xts(x = Total.coli, order.by = Date))
 Discharge <- with(discharge.dat, xts(x = Discharge_cfs, order.by = Date))
 
 DyDat <- cbind(Total_Coliform, Discharge)
+# puts the two together
 
 dygraph(DyDat) %>% 
   dySeries("Total_Coliform", axis = "y2") %>% 
+# scale on different y axis, each has their own
   dyAxis(name = "y", label = "Discharge (cfs)") %>%
   dyAxis(name = "y2", label = "Total Coliform (cfu per 100 ml)", valueRange = c(0, 600000)) %>%
   dyRangeSelector()
+# specify the range 0 to 600,000
+# might have to do something different in the homework
+
+# visualize with dygraph
+
+# dygraphs makes the function, have to send it time series data
 ```
 
 Look through the data series and see if you can find some times when a CSO likely occured. Create a ggplot of the 3-4 weeks surrounding the event. (Hint: use the skeleton code available below )
+> Looking for where there is a lot of microbes around a peak discharge
 
 ```{r CSO_event, eval=FALSE}
 
