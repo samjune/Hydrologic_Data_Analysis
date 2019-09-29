@@ -65,13 +65,22 @@ theme_set(theme_classic())
 7. Upload discharge data for the Eno River at site 02096500 for the same dates as we studied in class (2009-08-01 through 2019-07-31). Obtain data for discharge and gage height (you will need to look up these parameter codes). Rename the columns with informative titles. Imperial units can be retained (no need to change to metric).
 
 ```{r}
+EnoDischarge <- readNWISdv(siteNumbers = "02096500",
+                     parameterCd = c("30209",
+                                     "30207"),
+                     startDate = "2009-08-01",
+                     endDate = "2019-07-31")
 
+colnames(EnoDischarge)[colnames(MysterySiteDischarge)==
+                                 ""]<-"Discharge"
+colnames(EnoDischarge)[colnames(MysterySiteDischarge)==
+                                 ""]<-"GageHeight"
 ```
 
 8. Add a "year" column to your data frame (hint: lubridate has a `year` function).
 
 ```{r}
-
+EnoDischarge$Date <- format(as.Date(EnoDischarge$Date, format="%d/%m/%Y"),"%Y")
 ```
 
 9. Create a ggplot of discharge vs. gage height, with gage height as the x axis. Color each point by year. Make the following edits to follow good data visualization practices: 
@@ -81,7 +90,10 @@ theme_set(theme_classic())
 * Make points 50 % transparent
 
 ```{r}
+Discharge.vs.GageHeight <-
+ggplot(EnoDischarge, aes(x = GageHeight, y = Discharge))
 
+print(TempvsDepth)
 ```
 
 10. Interpret the graph you made. Write 2-3 sentences communicating the main takeaway points. 

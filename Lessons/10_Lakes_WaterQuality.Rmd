@@ -15,7 +15,7 @@ editor_options:
 
 ## Opening Discussion
 Nutrient loading is one of the most widespread water quality issues in lakes. Eutrophication leads to further issues such as harmful algal blooms, food web alterations, and hypoxia. Nitrogen (N) and phosphorus (P) are the main focus of nutrient loading studies and management, as they are the primary limiting nutrients for phytoplankton (algae and other single-celled primary producers) growth. Today, we will explore the LAGOS-NE dataset to find predictor variables for total N (TN) and total P (TP) concentrations in lakes.
-
+> 
 ## Session Set Up
 
 ```{r, message = FALSE}
@@ -46,21 +46,23 @@ names(LAGOSdata)
 
 In your group, look through the LAGOS-NE database and decide on 5 variables available in the database that may predict N and P concentrations in lakes. Remembering that hypotheses differ from predictions in that they propose a mechanism, make hypotheses about your choices in predictor variables and how they might affect N and P concentrations.
 
-> Variable 1: 
+> Variable 1: chla- chlorophyll a (µg/l)
 
-> Variable 2: 
+> Variable 2: dkn- nitrogen, dissolved Kjeldahl (µg/l as N)
 
-> Variable 3: 
+> Variable 3: doc- carbon, dissolved organic (µg/l as C)
 
-> Variable 4
+> Variable 4: tp- phosphorus, total (µg/l as P)
 
-> Variable 5: 
+> Variable 5: no2no3- nitrogen, nitrite NO2 + nitrate NO3 nitrogen (µg/l as N)
 
 Wrangle LAGOSdata so that you have a new data frame that includes TN, TP, your five variables, and any other columns that would be useful for you (e.g., lake id numbers). Helpful functions may include `join`, `select`, `filter`, and `mutate`. Consider whether you want to use `drop_na` to retain complete cases of individual variables or entire rows.
 
 ```{r}
 # Wrangle data here.
-
+NewData <- LAGOSnutrient %>%
+  select(lagoslakeid, sampledate, chla, dkn, doc, tp, no2no3)
+NewDataDropNa <- drop_na(NewData, 
 ```
 
 Examine potential correlations among your predictor variables. If your predictor variables are highly correlated with each other, your model will suffer from *multicollinearity,* essentially that two or more of your predictor variables provide redundant information. Model fit and accuracy of model coefficients suffer when multicollinearity is present. 

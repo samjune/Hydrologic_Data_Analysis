@@ -9,8 +9,6 @@ editor_options:
   chunk_output_type: console
 ---
 
-
-
 ## OVERVIEW
 
 This exercise accompanies the lessons in Hydrologic Data Analysis on water quality in rivers.
@@ -88,8 +86,15 @@ nutrients.dat <- readNWISqw(siteNumbers = "02097314",
                      endDate = "")
 
 nutrients.dat <- nutrients.dat %>%
-  select(foo = sample_dt, parm_cd, result_va) %>% 
-  filter(parm_cd == "00600")
+  select(Date = sample_dt, 
+         Parameter = parm_cd, 
+         Value = result_va)
+
+nitrogen <- filter(nutrients.dat, Parameter == "00600")
+phosporus <- filter(nutrients.dat, Parameter == "00665")
+
+
+  
 ```
 
 8. Create two ggplots stacked with cowplot that show nutrient concentrations over time.
