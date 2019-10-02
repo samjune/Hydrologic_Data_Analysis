@@ -1,6 +1,6 @@
 ---
 title: "Assignment 5: Water Quality in Lakes"
-author: "Student Name"
+author: "Sam June"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -28,15 +28,86 @@ The completed exercise is due on 2 October 2019 at 9:00 am.
 4. Load the LAGOSdata database and the trophic state index csv file we created on 2019/09/27.
 
 ```{r setup}
+getwd()
 
+library(tidyverse)
+library(lubridate)
+library(LAGOSNE)
+
+theme_set(theme_classic())
+
+LAGOSdata <- lagosne_load()
+load(file = "./Data/Raw/LAGOSdata.rda")
+
+LAGOSlocus <- LAGOSdata$locus
+LAGOSstate <- LAGOSdata$state
+LAGOSnutrient <- LAGOSdata$epi_nutr
+
+LAGOSlocus$lagoslakeid <- as.factor(LAGOSlocus$lagoslakeid)
+LAGOSnutrient$lagoslakeid <- as.factor(LAGOSnutrient$lagoslakeid)
+
+# Join data frames
+LAGOSlocations <- left_join(LAGOSlocus, LAGOSstate, by = "state_zoneid")
+
+# Order by number of lakes
+LAGOSlocations <- 
+  within(LAGOSlocations, 
+         state <- factor(state, levels = names(sort(table(state), decreasing=TRUE))))
+
+dim(LAGOSnutrient)
+class(LAGOSnutrient$sampledate)
+
+LAGOStrophic <- 
+  left_join(LAGOSnutrient, LAGOSlocations, by = "lagoslakeid") %>%
+  # should be wider but same length as LAGOSlocation?
+  select(lagoslakeid, sampledate, chla, tp, secchi, 
+         gnis_name, lake_area_ha, state, state_name) %>%
+  mutate(sampleyear = year(sampledate), 
+         samplemonth = month(sampledate), 
+         season = as.factor(quarter(sampledate, fiscal_start = 12))) %>%
+  # looks for month and then divides into 4 groups of months as the seasons
+  # may need to think about how you break up seasonality to comply with local system
+  drop_na(chla:secchi)
+# getting rid of rows, cla-secchi, get rid of entire row if NA is in row
+
+levels(LAGOStrophic$season) <- c("Winter", "Spring", "Summer", "Fall")
+
+LAGOStrophic <- 
+  mutate(LAGOStrophic, 
+         TSI.chl = round(10*(6 - (2.04 - 0.68*log(chla)/log(2)))),
+         # telling it plain log will generate natural log, must indicate log 10
+         TSI.secchi = round(10*(6 - (log(secchi)/log(2)))), 
+         TSI.tp = round(10*(6 - (log(48/tp)/log(2)))), 
+         trophic.class = 
+            ifelse(TSI.chl < 40, "Oligotrophic", 
+                   ifelse(TSI.chl < 50, "Mesotrophic",
+                          ifelse(TSI.chl < 70, "Eutrophic", "Hypereutrophic"))))
+
+LAGOStrophic$trophic.class <- 
+  factor(LAGOStrophic$trophic.class,
+         levels = c("Oligotrophic", "Mesotrophic", "Eutrophic", "Hypereutrophic"))
+
+LAGOStrophic$season <- 
+   factor(LAGOStrophic$season,
+          levels = c("Spring", "Summer", "Fall", "Winter"))
+
+# scales::show_col(colormap(colormap = colormaps$magma, nshades=16))
 ```
 
 ## Trophic State Index
 
 5. Similar to the trophic.class column we created in class (determined from TSI.chl values), create two additional columns in the data frame that determine trophic class from TSI.secchi and TSI.tp (call these trophic.class.secchi and trophic.class.tp). 
 
-```{r}
 
+
+```{r}
+LAGOStrophic <- LAGOStrophic %>% 
+  mutate(trophic.class.secchi = 
+            ifelse(TSI.secchi < 100, "TRUE", "FALSE")) %>% 
+  mutate(trophic.class.tp =
+           ifelse(TSI.tp > 100, "TRUE", "FALSE"))
+
+write_csv(LAGOStrophic, "foo.csv")
 ```
 
 

@@ -61,8 +61,9 @@ Wrangle LAGOSdata so that you have a new data frame that includes TN, TP, your f
 ```{r}
 # Wrangle data here.
 NewData <- LAGOSnutrient %>%
-  select(lagoslakeid, sampledate, chla, dkn, doc, tp, no2no3)
-NewDataDropNa <- drop_na(NewData, 
+  select(lagoslakeid, sampledate, chla, tn, tp, nh4, no2no3)
+
+NewDataDropNa <- drop_na(NewData)
 ```
 
 Examine potential correlations among your predictor variables. If your predictor variables are highly correlated with each other, your model will suffer from *multicollinearity,* essentially that two or more of your predictor variables provide redundant information. Model fit and accuracy of model coefficients suffer when multicollinearity is present. 
@@ -70,17 +71,22 @@ Examine potential correlations among your predictor variables. If your predictor
 1. Create a correlation plot for your 7 variables of interest (TN, TP, and the five predictor variables). What patterns do you see? (hint: function `corrplot` in the corrplot package. I like to use `upper = "ellipse"` inside the function).
 
 ```{r}
+NewData.correlation <- cor(NewDataDropNa[ ,3:7])
+corrplot(NewData.correlation, method = "ellipse")
 
+print(NewData.correlation)
 ```
 
 What patterns do you see?
 
->
+> tn is strongly correlated with no2no3, mediumly correlated with tp and mildly correlated with chal and nh4
+> tp is strongly correlated with chla, mediumly correlated with tn, mildly correlated with nh4 and not correlated with no2no3.
 
 2. Create two linear regression models (hint: function `lm`) to predict TN and TP using your five predictor variables. 
 
 ```{r}
-
+chla_tpTest <- lm(chla ~ tn,NewDataDropNa)
+summary(chla_tpTest)
 ```
 
 How much variance in TN and TP is accounted for by your full model?
