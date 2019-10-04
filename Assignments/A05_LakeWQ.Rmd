@@ -101,13 +101,49 @@ LAGOStrophic$season <-
 
 
 ```{r}
-LAGOStrophic <- LAGOStrophic %>% 
-  mutate(trophic.class.secchi = 
-            ifelse(TSI.secchi < 100, "TRUE", "FALSE")) %>% 
-  mutate(trophic.class.tp =
-           ifelse(TSI.tp > 100, "TRUE", "FALSE"))
+# LAGOStrophic <- LAGOStrophic %>% 
+  # mutate(trophic.class.secchi = 
+           # ifelse(TSI.secchi < 100, "TRUE", "FALSE")) %>% 
+  # mutate(trophic.class.tp =
+           # ifelse(TSI.tp > 100, "TRUE", "FALSE"))
 
-write_csv(LAGOStrophic, "foo.csv")
+# write_csv(LAGOStrophic, "foo.csv")
+
+foo <- 
+  mutate(LAGOStrophic, 
+         TSI.chl = round(10*(6 - (2.04 - 0.68*log(chla)/log(2)))),
+         # telling it plain log will generate natural log, must indicate log 10
+         TSI.secchi = round(10*(6 - (log(secchi)/log(2)))), 
+         TSI.tp = round(10*(6 - (log(48/tp)/log(2)))), 
+         trophic.class.secchi = 
+            ifelse(TSI. < 40, "Oligotrophic", 
+                   ifelse(TSI.secchi < 50, "Mesotrophic",
+                          ifelse(TSI.secchi < 70, "Eutrophic", "Hypereutrophic"))))
+
+foo <- 
+  mutate(LAGOStrophic, 
+         TSI.chl = round(10*(6 - (2.04 - 0.68*log(chla)/log(2)))),
+         # telling it plain log will generate natural log, must indicate log 10
+         TSI.secchi = round(10*(6 - (log(secchi)/log(2)))), 
+         TSI.tp = round(10*(6 - (log(48/tp)/log(2)))), 
+         trophic.class.secchi = 
+            ifelse(TSI.secchi < 40, "Oligotrophic", 
+                   ifelse(TSI.secchi < 50, "Mesotrophic",
+                          ifelse(TSI.secchi < 70, "Eutrophic", "Hypereutrophic"))))
+
+foo <- 
+  mutate(LAGOStrophic, 
+         TSI.chl = round(10*(6 - (2.04 - 0.68*log(chla)/log(2)))),
+         # telling it plain log will generate natural log, must indicate log 10
+         TSI.secchi = round(10*(6 - (log(secchi)/log(2)))), 
+         TSI.tp = round(10*(6 - (log(48/tp)/log(2)))), 
+         trophic.class.secchi = 
+            ifelse(TSI.secchi < 40, "Oligotrophic", 
+                   ifelse(TSI.secchi < 50, "Mesotrophic",
+                          ifelse(TSI.secchi < 70, "Eutrophic", "Hypereutrophic"))))
+
+#LAGOStrophic$trophic.class <- 
+  #factor(LAGOStrophic$trophic.class,
 ```
 
 

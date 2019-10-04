@@ -34,13 +34,19 @@ Analysis of time series presents several opportunities. In aquatic sciences, som
 * Has there been an increasing or decreasing **trend** in the response variable over time?
 * Can we **forecast** conditions in the future?
 
+> if we can model the past, we can accurately predict the future
+
 ### Challenges
 
 Time series datasets come with several caveats, which need to be addressed in order to effectively model the system. A few common challenges that arise (and can occur together within a single dataset) are: 
 
 * **Autocorrelation**: Data points are not independent from one another (i.e., the measurement at a given time point is dependent on previous time point(s))
 * **Data gaps**: Data are not collected at regular intervals, necessitating *interpolation* between measurements.
+
+> not doing today
 * **Seasonality**: Cyclic patterns in variables occur at regular intervals, impeding clear interpretation of a monotonic (unidirectional) trend.
+
+> can also be subdaily, not just seasons of the year, can be any scheduled time series
 * **Heteroscedasticity**: The variance of the time series is not constant over time
 * **Covariance**: the covariance of the time series is not constant over time
 
@@ -60,7 +66,7 @@ Let's gather all the discharge data available from this site. Notice that `readN
 ClearCreekDischarge <- readNWISdv(siteNumbers = "06719505",
                      parameterCd = "00060", # discharge (ft3/s)
                      startDate = "",
-                     endDate = "")
+                     endDate = "") 
 names(ClearCreekDischarge)[4:5] <- c("Discharge", "Approval.Code")
 class(ClearCreekDischarge$Date)
 
@@ -79,6 +85,10 @@ print(ClearCreekPlot)
 
 ```
 
+> what patterns do we see?
+  cyclacle- peaks very 15-20 years, sucra-seasonal, like el nino/la nina, larger than seasonal time sales
+  seasonal cycle- 
+
 The simplest option to characterize a time series is a linear regression. 
 ```{r}
 ClearCreekRegressionPlot <- 
@@ -93,11 +103,12 @@ print(ClearCreekRegressionPlot)
 
 Is a linear regression an appropriate model for the data in this case? Why or why not?
 
-> 
+> no. because it does not predict discharge
 
 Are there situations where it would be appropriate to use a linear regression to model a time series? If so, what is an example?
 
->
+> if you are compairing one day over several years, smaller timescale that elinimates seasonality?
+> CHECK IF I AM UNDERSTANDIGN THIS CORRECTLY
 
 
 ## Decomposing a time series dataset
@@ -105,17 +116,21 @@ Are there situations where it would be appropriate to use a linear regression to
 A given time series can be made up of several component series: 
 
 1. A **seasonal** component, which repeats over a fixed known period (e.g., seasons of the year, months, days of the week, hour of the day)
+> snowpacked dominated system in Colorado
 2. A **trend** component, which quantifies the upward or downward progression over time. The trend component of a time series does not have to be monotonic.
 3. An **error** or **random** component, which makes up the remainder of the time series after other components have been accounted for. This component reflects the noise in the dataset. 
+> anything that is not predicted? CHECK
 4. (optional) A **cyclical** component, which repeats over periods greater than the seasonal component. A good example of this in hydrologic data is El Niño Southern Oscillation (ENSO) cycles, which occur over a period of 2-8 years.
 
 We first need to turn the discharge data into a time series object in R. This is done using the `ts` function. Notice we can only specify one column of data and need to specify the period at which the data are sampled. The resulting time series object cannot be viewed like a regular data frame.
 
 Note: time series objects must be equispaced, which requires interpolation if the data have not been collected at regular intervals. In our case, we have daily data with no NAs in the data frame, so we don't need to worry about this.
 ```{r}
-ClearCreek_ts <- ts(ClearCreekDischarge[[4]], frequency = 365)
-
+ClearCreek_ts <- ts(ClearCreekDischarge[[4]], frequency = 365) # is a value set, not a data frame ?
+# table(diff(ClearCreekDischarge$Date))
 ```
+> ts is time series, can only include one column of data, we are not including date
+ how do you have time if you do not have date? make sure step is same each time. no NAs in data.
 
 The `stl` function decomposes the time series object into its component parts. We must specify that the window for seasonal extraction is either "periodic" or a specific number of at least 7. The decomposition proceeds through a loess (locally estimated scatterplot smoothing) function.
 
@@ -132,6 +147,7 @@ ClearCreek_Components <- as.data.frame(ClearCreek_Decomposed$time.series[,1:3])
 ClearCreek_Components <- mutate(ClearCreek_Components,
                       Observed = ClearCreekDischarge$Discharge,     
                       Date = ClearCreekDischarge$Date)
+# WHAT HAPPENED?
 
 # Visualize how the trend maps onto the data
 ggplot(ClearCreek_Components) +
@@ -150,6 +166,7 @@ ggplot(ClearCreek_Components) +
 ```
 
 Note that the decomposition can yield negative values when we apply a seasonal adjustment or a trend adjustment to the data. The decomposition is not constrained by a lower bound of zero as discharge is in real life. Make sure to interpret with caution!
+> might end up with numbers that ar enot realsitic, the end result sneeds to be real numbers?
 
 ## Closing Discussion
 Next lesson we will discuss how to backcast, forecast, and detect monotonic trends in time series data.
